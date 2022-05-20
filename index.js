@@ -23,7 +23,7 @@ module.exports = function({ template }) {
 				const pointAST = template.statement(`var buried="${comment.value}";`)();
 				// console.log("pointAST: ", pointAST.type);
 				pathBody.push(pointAST);
-				path.get(commentName).splice(i, 1);
+				path.node[commentName].splice(i, 1); // path.get取出来的不行
 			}
 		}
 	}
