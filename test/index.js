@@ -40,6 +40,5 @@ fn();
 
 const a = () => {
 	// a
-	console.log(buried);
 };
 a();

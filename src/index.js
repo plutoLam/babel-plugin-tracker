@@ -24,14 +24,21 @@ module.exports = function({ template }) {
 				// console.log(commentName, "待更换的注释是", comment.value);
 				const commentArr = comment.value.split("-");
 				if (commentArr && commentArr[0]?.trim() === "buried") {
-					const id = commentArr[1];
+					const id = commentArr[1].trim();
 					console.log("buriedInfo[id]", id, buriedInfo[id]);
+					const params = buriedInfo[id] === undefined ? undefined : buriedInfo[id].map(v => {
+						return v && v[0] === "#" ? v.slice(1, v.length) : `"${v}"`;
+					});
 
-					const param1 = buriedInfo[id] === undefined ? undefined : buriedInfo[id][0] && buriedInfo[id][0][0] === "#" ? buriedInfo[id][0].slice(1, buriedInfo[id][0].length) : `"${buriedInfo[id][0]}"`;
-					const param2 = buriedInfo[id] === undefined ? undefined : buriedInfo[id][1] && buriedInfo[id][1][0] === "#" ? buriedInfo[id][1].slice(1, buriedInfo[id][1].length) : `"${buriedInfo[id][1]}"`;
-					console.log("param2: ", param2);
-					console.log("param1: ", param1);
-					const pointAST = template.statement(`window.AddStatistic(${param1}, ${param2});`)();
+					// const param1 = buriedInfo[id] === undefined ? undefined : buriedInfo[id][0] && buriedInfo[id][0][0] === "#" ? buriedInfo[id][0].slice(1, buriedInfo[id][0].length) : `"${buriedInfo[id][0]}"`;
+					// const param2 = buriedInfo[id] === undefined ? undefined : buriedInfo[id][1] && buriedInfo[id][1][0] === "#" ? buriedInfo[id][1].slice(1, buriedInfo[id][1].length) : `"${buriedInfo[id][1]}"`;
+					console.log("param: ", params);
+					console.log("param: ", `window.AddStatistic(${params.join(", ")});`);
+					/* const node = params.reduce((v, t) => {
+						v += t + ",";
+						return v;
+					}, ""); */
+					const pointAST = template.statement(`window.AddStatistic(${params[0]},${params[1]});`)();
 					// console.log("pointAST: ", pointAST);
 					pathBody.push(pointAST);
 					path.node[commentName].splice(i, 1); // path.get取出来的不行
@@ -39,23 +46,17 @@ module.exports = function({ template }) {
 			}
 		}
 	}
-	function parseXlsx() {
-		// excel文件类径
-		const excelFilePath = path.resolve(__dirname, "../buried.xlsx");
-
+	function parseXlsx(excelFilePath) {
 		// 解析excel, 获取到所有sheets
 		const sheets = xlsx.parse(excelFilePath);
-
-		// 查看页面数
-		console.log(sheets.length);
-
-		// 打印页面信息..
 		const sheet = sheets[0];
-
-		// 输出每行内容
 		return sheet.data.reduce((v, t) => {
 			if (t[1] === "id") return v;
-			v[t[1]] = [t[3], t[4]];
+			const paramsArr = [];
+			for (let i = 3; i < t.length; i++) {
+				paramsArr.push(t[i]);
+			}
+			v[t[1]] = paramsArr;
 			return v;
 		}, {});
 	}
@@ -82,14 +83,20 @@ module.exports = function({ template }) {
 			Program: {
 				enter(path, state) {
 					console.log("enter");
-					state.buriedInfo = parseXlsx();
+					const { xlsxPath, func, script } = state.opts;
+					state.buriedInfo = parseXlsx(xlsxPath);
 					console.log("state.buriedInfo: ", state.buriedInfo);
-					const globalNode = template(`
-					window.AddStatistic = function(category, action) {
-						console.log(category,action);
-						window._hmt && window._hmt.push(["_trackEvent", category, action]);
-					};
-					`)();
+
+					// 注入添加script代码
+					const addSctipt = `(function() {
+						const script = document.createElement("script");
+						script.type = "text/javascript";
+						script.src = "${script}";
+						document.getElementsByTagName("head")[0].appendChild(script);
+					})();`;
+					const addSctiptNode = template(addSctipt)();
+					path.node.body.unshift(addSctiptNode);
+					const globalNode = template(`window.AddStatistic = ${func}`)();
 					path.node.body.unshift(globalNode);
 				},
 				exit(path) {
