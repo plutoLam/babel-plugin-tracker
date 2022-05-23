@@ -4,21 +4,19 @@ class App {
 	/* 块级 */
 	// 123
 	inClass() {
-		// inClass
+		// buried-0
 		console.log(213);
 	}
 }
 // 外边的猴嘴
 
 function fn() { // fn右边
-	// fn
-	console.log(buried);
+	// buried-1
 	const a = 1;
 	function inFn() {
-		// inFn2
-		// inFn
-		console.log(buried);
-		// 在log后面b前面
+		// buried-2
+		// buried-3
+		// buried-4
 		const b = 2;
 	}
 	// 猴嘴
@@ -28,7 +26,13 @@ function fn() { // fn右边
 		console.log(123);
 		function test() {
 			console.log(234);
-			// test
+			// buried-5
+			const arr = () => {
+				// buried-6
+				function haha() {
+					// buried-7
+				}
+			};
 		}
 	}
 }

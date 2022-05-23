@@ -16,6 +16,7 @@
     "@babel/preset-env": "^7.17.12",
     "@babel/traverse": "^7.17.12",
     "babel-loader": "^8.2.5",
+    "node-xlsx": "^0.21.0",
     "webpack": "^5.72.1",
     "webpack-cli": "^4.9.2"
   }

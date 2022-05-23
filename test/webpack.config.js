@@ -21,7 +21,7 @@ module.exports = {
 					],
 					plugins: [
 						[
-							path.resolve(__dirname, "../index.js"),
+							path.resolve(__dirname, "../src/index.js"),
 							{
 								pathName: path.resolve(__dirname, "./tracker.js")
 							}
