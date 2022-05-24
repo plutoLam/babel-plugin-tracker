@@ -25,18 +25,16 @@ module.exports = {
 							{
 								xlsxPath: path.resolve(__dirname, "../buried.xlsx"),
 								func: `
-								function(category, action) {
-									console.log(category,action);
-									window._hmt && window._hmt.push(["_trackEvent", category, action]);
-								};
-								`,
+							function(category, action) {
+								console.log(category,action);
+								window._hmt && window._hmt.push(["_trackEvent", category, action]);
+							};
+							`,
 								script: "https://test.js"
 							}
 						]
-
 					]
 				}
-
 			}
 		]
 	}
