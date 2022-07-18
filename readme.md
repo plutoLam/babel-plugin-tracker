@@ -15,6 +15,7 @@ yarn add babel-plugin-tracker
 const path = require("path");
 
 module.exports = {
+	mode: "development",
 	...
 	module: {
 		rules: [
@@ -23,10 +24,12 @@ module.exports = {
 				exclude: /node_modules/,
 				loader: "babel-loader",
 				options: {
-					...
+					presets: [
+						"@babel/preset-env"
+					],
 					plugins: [
 						[
-							"babel-plugin-tracker",
+							path.resolve(__dirname, "../src/index.js"),
 							{
 								xlsxPath: path.resolve(__dirname, "../buried.xlsx"),
 								func: `
