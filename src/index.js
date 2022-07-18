@@ -1,32 +1,23 @@
 const xlsx = require("node-xlsx");
 
-module.exports = function({ template }) {
-	function handleComments(path, comments, commentName, pathBody, buriedInfo) { // 去重
-		replaceComments(path, comments, commentName, pathBody, buriedInfo);
-	}
-	function replaceComments(path, comments, commentName, pathBody, buriedInfo) {
+module.exports = function ({ template }) {
+	function handleComments(path, comments, commentName, pathBody, buriedInfo, isAdd) {
 		if (!comments?.length) return;
 		for (let i = comments.length - 1; i >= 0; i--) {
 			const comment = comments[i];
 			if (comment?.type === "CommentLine") { // 只替换行级
 				const commentArr = comment.value.split("-");
 				if (commentArr && commentArr[0]?.trim() === "buried") {
-					const id = commentArr[1].trim();
-					console.log("buriedInfo[id]", id, buriedInfo[id]);
-					const params = buriedInfo[id] === undefined ? undefined : buriedInfo[id].map(v => {
-						return v && v[0] === "#" ? v.slice(1, v.length) : `"${v}"`;
-					});
-					// const param1 = buriedInfo[id] === undefined ? undefined : buriedInfo[id][0] && buriedInfo[id][0][0] === "#" ? buriedInfo[id][0].slice(1, buriedInfo[id][0].length) : `"${buriedInfo[id][0]}"`;
-					// const param2 = buriedInfo[id] === undefined ? undefined : buriedInfo[id][1] && buriedInfo[id][1][0] === "#" ? buriedInfo[id][1].slice(1, buriedInfo[id][1].length) : `"${buriedInfo[id][1]}"`;
-					console.log("param: ", params);
-					console.log("param: ", `window.AddStatistic(${params.join(", ")});`);
-					/* const node = params.reduce((v, t) => {
-						v += t + ",";
-						return v;
-					}, ""); */
-					const pointAST = template.statement(`window.AddStatistic(${params[0]},${params[1]});`)();
-					// console.log("pointAST: ", pointAST);
-					pathBody.push(pointAST);
+					if (isAdd) {
+						console.log(commentName, "待更换的注释是", comment.value);
+						const id = commentArr[1].trim();
+						// console.log("buriedInfo[id]", id, buriedInfo[id]);
+						const params = buriedInfo[id] === undefined ? undefined : buriedInfo[id].map(v => {
+							return v && v[0] === "#" ? v.slice(1, v.length) : `"${v}"`;
+						});
+						const pointAST = template.statement(`window.AddStatistic(${params[0]},${params[1]});`)();
+						pathBody.push(pointAST);
+					}
 					path.node[commentName].splice(i, 1); // path.get取出来的不行
 				}
 			}
@@ -79,16 +70,10 @@ module.exports = function({ template }) {
 						const innerComments = path.node.innerComments;
 						const leadingComments = path.node.leadingComments;
 						const trailingComments = path.node.trailingComments;
-						handleComments(path, innerComments, "innerComments", path.node.body, state.buriedInfo);
-						// 为了去重，必须要在这里判断是否有leading
-						if (leadingComments?.length) {
-							if (!path.getSibling(path.key - 1)?.node?.trailingComments && path) { // 如果上个兄弟节点有trail则不处理,这里不能判断comments.length，因为在上面splice删除以后length可能就为0了，又会重复
-								handleComments(path, leadingComments, "leadingComments", path.parent.body, state.buriedInfo);
-							}
-						}
-						if (trailingComments?.length) {
-							handleComments(path, trailingComments, "trailingComments", path.parent.body, state.buriedInfo);
-						}
+						handleComments(path, innerComments, "innerComments", path.node.body, state.buriedInfo, true);
+						const isSiblingTrailExit = !path.getSibling(path.key - 1)?.node?.trailingComments;
+						handleComments(path, leadingComments, "leadingComments", path.parent.body, state.buriedInfo, isSiblingTrailExit);
+						handleComments(path, trailingComments, "trailingComments", path.parent.body, state.buriedInfo, true);
 					}
 				});
 			}

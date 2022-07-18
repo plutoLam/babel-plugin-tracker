@@ -16,21 +16,22 @@ function fn() { // fn右边
 	function inFn() {
 		// buried-2
 		// buried-3
+		console.log(2);
 		// buried-4
-		const b = 2;
 	}
 	// 猴嘴
 	inFn();
 
 	function testFn() {
-		console.log(123);
+		const a = 123;
+		// buried-7
 		function test() {
 			console.log(234);
 			// buried-5
 			const arr = () => {
 				// buried-6
 				function haha() {
-					// buried-7
+					// aaa
 				}
 			};
 		}
@@ -39,6 +40,6 @@ function fn() { // fn右边
 fn();
 
 const a = () => {
-	// a
+	// buri
 };
 a();
