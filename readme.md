@@ -31,36 +31,36 @@ yarn add babel-plugin-tracker
 const path = require("path");
 
 module.exports = {
-	...
-	module: {
-		rules: [
-			{
-				test: /\.js$/,
-				exclude: /node_modules/,
-				loader: "babel-loader",
-				options: {
-					presets: [
-						"@babel/preset-env"
-					],
-					plugins: [
-						[
-							path.resolve(__dirname, "../src/index.js"),
-							{
-								xlsxPath: path.resolve(__dirname, "../buried.xlsx"),
-								func: `
-							function(category, action) {
-								console.log(category,action);
-								window._hmt && window._hmt.push(["_trackEvent", category, action]);
-							};
-							`,
-								script: "https://test.js"
-							}
-						]
-					]
-				}
-			}
-		]
-	}
+  ...
+  module: {
+	rules: [
+	  {
+		test: /\.js$/,
+		exclude: /node_modules/,
+		loader: "babel-loader",
+		options: {
+		  presets: [
+			"@babel/preset-env"
+		  ],
+		  plugins: [
+			[
+			  path.resolve(__dirname, "../src/index.js"),
+			  {
+			    xlsxPath: path.resolve(__dirname, "../buried.xlsx"),
+			    func: `
+				  function(category, action) {
+					console.log(category,action);
+					window._hmt && window._hmt.push(["_trackEvent", category, action]);
+				  };
+			    `,
+			    script: "https://test.js"
+			  }
+			]
+		  ]
+		}
+	  }
+    ]
+  }
 };
 ```
 参数说明
