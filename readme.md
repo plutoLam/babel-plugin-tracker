@@ -38,14 +38,13 @@ yarn add babel-plugin-tracker
 		],
 		plugins: [
 			[
-				// path.resolve(__dirname, "../src/index.js"),
 				"babel-plugin-tracker",
 				{
 					xlsxPath: path.resolve(__dirname, "../buried.xlsx"),
 					func: `
 					function(category, action) {
 						console.log(category,action);
-						window._hmt && window._hmt.push(["_trackEvent", 									category, action]);
+						window._hmt && window._hmt.push(["_trackEvent", category, action]);
 					};
 					`,
 					script: "https://test.js"
