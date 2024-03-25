@@ -21,7 +21,8 @@ module.exports = {
 					],
 					plugins: [
 						[
-							path.resolve(__dirname, "../src/index.js"),
+							// path.resolve(__dirname, "../src/index.js"),
+							"babel-plugin-tracker",
 							{
 								xlsxPath: path.resolve(__dirname, "../buried.xlsx"),
 								func: `
